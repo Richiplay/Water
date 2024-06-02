@@ -1,0 +1,36 @@
+import time
+import Adafruit_DHT
+import smbus2
+from bh1750 import BH1750
+
+# Настройка DHT22
+DHT_SENSOR = Adafruit_DHT.DHT22
+DHT_PIN = 4
+
+# Настройка BH1750
+BH1750_ADDRESS = 0x23
+bus = smbus2.SMBus(1)
+sensor = BH1750(bus, BH1750_ADDRESS)
+
+def read_temperature_humidity():
+    humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
+    return temperature, humidity
+
+def read_light():
+    light_level = sensor.luminance(BH1750.ONCE_HIRES_1)
+    return light_level
+
+def main():
+    try:
+        while True:
+            temperature, humidity = read_temperature_humidity()
+            light_level = read_light()
+            print(f"Temperature: {temperature:.2f} C")
+            print(f"Humidity: {humidity:.2f} %")
+            print(f"Light Level: {light_level:.2f} lux")
+            time.sleep(10)
+    except KeyboardInterrupt:
+        pass
+
+if __name__ == "__main__":
+    main()
